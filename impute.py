@@ -100,7 +100,9 @@ class SpotDataset(Dataset):
     def __init__(self, x_all, y, locs, radius):
         super().__init__()
         mask = get_disk_mask(radius)
+        print(f'y shape: {y.shape}, locs shape: {locs.shape}, mask shape: {mask.shape}')
         x = get_patches_flat(x_all, locs, mask)
+        print(f'x shape: {x.shape}, y shape: {y.shape}, locs shape: {locs.shape}, mask shape: {mask.shape}')
         isin = np.isfinite(x).all((-1, -2))
         self.x = x[isin]
         self.y = y[isin]
@@ -134,6 +136,7 @@ class SpotDataset(Dataset):
 def get_disk(img, ij, radius):
     i, j = ij
     patch = img[i-radius:i+radius, j-radius:j+radius]
+    print(f'patch shape: {patch.shape}')
     disk_mask = get_disk_mask(radius)
     patch[~disk_mask] = 0.0
     return patch
@@ -145,6 +148,14 @@ def get_patches_flat(img, locs, mask):
     r = np.stack([-center, shape-center], -1)  # offset
     x_list = []
     for s in locs:
+        print(f"Test 1: {s[0]+r[0][1]}, {img.shape[0]}")
+        print(f"Test 2: {s[0]+r[0][0]}, {img.shape[0]}")
+
+        if (s[0]+r[0][0] < 0 or s[0]+r[0][1] > img.shape[0] or
+            s[1]+r[1][0] < 0 or s[1]+r[1][1] > img.shape[1]):
+            print(f"Skipping out-of-bounds loc: {s}, r: {r}, s.shape: {s.shape}, img.shape: {img.shape}, r.shape: {r.shape}, ({s[0]+r[0][0]}, {s[1]+r[1][0]}), ({s[0]+r[0][1]}, {s[1]+r[1][1]})")
+            continue
+        print(f"loc: {s}, slice: [{s[0]+r[0][0]}:{s[0]+r[0][1]}, {s[1]+r[1][0]}:{s[1]+r[1][1]}], img shape: {img.shape}, r: {r}, s.shape: {s.shape}, r.shape: {r.shape}, ({s[0]+r[0][0]}, {s[1]+r[1][0]}), ({s[0]+r[0][1]}, {s[1]+r[1][1]})")
         patch = img[
                 s[0]+r[0][0]:s[0]+r[0][1],
                 s[1]+r[1][0]:s[1]+r[1][1]]
@@ -389,6 +400,9 @@ def get_args():
 def main():
     args = get_args()
     embs, cnts, locs = get_data(args.prefix)
+    print('Embeddings:', embs.shape)
+    print('Counts:', cnts.shape)
+    print('Locations:', locs.shape)
     args = get_args()
 
     factor = 16

@@ -7,6 +7,10 @@ device="cuda"  # "cuda" or "cpu"
 pixel_size=0.5  # desired pixel size for the whole analysis
 n_genes=1000  # number of most variable genes to impute
 
+device="cpu"  # "cuda" or "cpu"
+pixel_size=0.0005  # desired pixel size for the whole analysis
+n_genes=500  # number of most variable genes to impute
+
 # preprocess histology image
 echo $pixel_size > ${prefix}pixel-size.txt
 python rescale.py ${prefix} --image
@@ -45,10 +49,10 @@ python plot_imputed.py ${prefix}
 # segment image by gene features
 python cluster.py --filter-size=8 --min-cluster-size=20 --n-clusters=10 --mask=${prefix}mask-small.png ${prefix}embeddings-gene.pickle ${prefix}clusters-gene/
 # # segment image without tissue mask
-# python cluster.py --filter-size=8 --min-cluster-size=20 ${prefix}embeddings-gene.pickle ${prefix}clusters-gene/unmasked/
+python cluster.py --filter-size=8 --min-cluster-size=20 ${prefix}embeddings-gene.pickle ${prefix}clusters-gene/unmasked/
 # # segment image without spatial smoothing
-# python cluster.py --mask=${prefix}mask-small.png ${prefix}embeddings-gene.pickle ${prefix}clusters-gene/unsmoothed/
-# python cluster.py ${prefix}embeddings-gene.pickle ${prefix}clusters-gene/unsmoothed/unmasked/
+python cluster.py --mask=${prefix}mask-small.png ${prefix}embeddings-gene.pickle ${prefix}clusters-gene/unsmoothed/
+python cluster.py ${prefix}embeddings-gene.pickle ${prefix}clusters-gene/unsmoothed/unmasked/
 
 # differential analysis by clusters
 python aggregate_imputed.py ${prefix}
