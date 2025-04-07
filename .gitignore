@@ -1,0 +1,17 @@
+*.pyc
+*.png
+*.pth
+*.DS_Store
+__pycache__/
+*.egg-info/
+*.egg
+*.log
+*.json
+*.pt
+*.zip
+*.tar.gz
+*.tar
+*.tsv
+*.jpg
+*.pickle
+*.pkl
