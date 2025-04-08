@@ -88,7 +88,11 @@ def main():
 
     if args.locs:
         locs = load_tsv(args.prefix+'locs-raw.tsv')
+        print("Scale: ", scale)
         locs = locs * scale
+        #print max and mni of new locs
+        print("Max locs: ", locs.max(axis=0))
+        print("Min locs: ", locs.min(axis=0))
         locs = locs.round().astype(int)
         save_tsv(locs, args.prefix+'locs.tsv')
 
