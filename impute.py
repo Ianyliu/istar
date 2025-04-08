@@ -210,7 +210,7 @@ def get_model(
         x, y, locs, radius, prefix, batch_size, epochs, lr,
         load_saved=False, device='cuda'):
 
-    print('x:', x.shape, ', y:', y.shape)
+    print('x:', x.shape, ', y:', y.shape, ", locs:", locs.shape, ", radius:", radius, ", batch_size:", batch_size, "epochs:", epochs)
 
     x = x.copy()
 
