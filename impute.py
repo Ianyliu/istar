@@ -149,7 +149,7 @@ def get_patches_flat(img, locs, mask):
     x_list = []
     for s in locs:
         print(f"Test 1: {s[0]+r[0][1]}, {img.shape[0]}")
-        print(f"Test 2: {s[0]+r[0][0]}, {img.shape[0]}")
+        print(f"Test 2: {s[1]+r[1][1]}, {img.shape[1]}")
 
         if (s[0]+r[0][0] < 0 or s[0]+r[0][1] > img.shape[0] or
             s[1]+r[1][0] < 0 or s[1]+r[1][1] > img.shape[1]):
@@ -160,8 +160,13 @@ def get_patches_flat(img, locs, mask):
                 s[0]+r[0][0]:s[0]+r[0][1],
                 s[1]+r[1][0]:s[1]+r[1][1]]
         if mask.all():
+            # All elements in the mask are True
             x = patch
+        elif not mask.any():
+            # All elements in the mask are False
+            x = np.zeros_like(patch)
         else:
+            # Handle partial masks
             x = patch[mask]
         x_list.append(x)
     x_list = np.stack(x_list)
@@ -197,6 +202,7 @@ def get_data(prefix):
     embs = get_embeddings(prefix)
     # embs = embs[..., :192]  # use high-level features only
     # embs = reduce_embeddings(embs)
+    
     locs = get_locs(prefix, target_shape=embs.shape[:2])
     # embs = add_coords(embs)
     return embs, cnts, locs
