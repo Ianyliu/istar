@@ -165,28 +165,35 @@ def get_locs(prefix, target_shape=None):
 
     # match coordinates of embeddings and spot locations
     if target_shape is not None:
+        print("Target shape provided, rescaling locs...")
         wsi = load_image(f'{prefix}he.jpg')
         current_shape = np.array(wsi.shape[:2])
         print(f"WSI shape: {current_shape}, Target shape: {target_shape}")
 
+        # rescale_factor = current_shape // target_shape
+        # print(f"Rescale factor: {rescale_factor}")
+        
         rescale_factor = current_shape // target_shape
-        print(f"Rescale factor: {rescale_factor}")
+        print(f"Rescale factor no-int division: {current_shape / target_shape}, integer rescale factor: {current_shape // target_shape}")
 
         locs = locs.astype(float)
         locs /= rescale_factor
         print(f"Rescaled locs: {locs[:5]} (showing first 5)")
 
+    assert np.allclose(current_shape / target_shape, rescale_factor), "Rescale factor mismatch"
+    assert locs[:, 0].max() <= current_shape[0], "locs exceed current height"
+    assert locs[:, 1].max() <= current_shape[1], "locs exceed current width"
 
     # find the nearest pixel
     locs = locs.round().astype(int)
-    
-        # Check for out-of-bounds locations
-    if target_shape is not None:
-        out_of_bounds = (locs[:, 0] < 0) | (locs[:, 0] >= target_shape[0]) | \
-                        (locs[:, 1] < 0) | (locs[:, 1] >= target_shape[1])
-        if np.any(out_of_bounds):
-            print(f"Warning: {np.sum(out_of_bounds)} out-of-bounds locs detected!")
-            print(f"Out-of-bounds locs (first 5): {locs[out_of_bounds][:5]}")
+            
+    # Check for out-of-bounds locations
+    out_of_bounds = (locs[:, 0] < 0) | (locs[:, 0] >= target_shape[0]) | \
+                    (locs[:, 1] < 0) | (locs[:, 1] >= target_shape[1])
+    if np.any(out_of_bounds):
+        print(f"Warning: {np.sum(out_of_bounds)} out-of-bounds locs detected!")
+        print(f"Out-of-bounds locs (first 5): {locs[out_of_bounds][:5]}")
+
 
     return locs
 
